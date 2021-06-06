@@ -7,36 +7,54 @@ wallBraceWideWidth = 40;
 wallBraceNarrowWidth = 10;
 wallBraceHeight = 50;
 wallBraceThickness = 5;
-wallBraceExtrusion = 30;
+wallBraceExtrusion = 60;
 
 module shelfWallBraceFrame() {
   union() {
-    cube([wallBraceNarrowWidth, wallBraceThickness, wallBraceHeight]);
-    translate([
-      (wallBraceWideWidth - wallBraceNarrowWidth) / -2,
-      0,
-      wallBraceHeight - wallBraceNarrowWidth,
-    ])
-      cube([wallBraceWideWidth, wallBraceThickness, wallBraceNarrowWidth]);
+    translate([0, wallBraceHeight / 2, 0])
+      cube(
+        size=[wallBraceNarrowWidth, wallBraceHeight, wallBraceThickness],
+        center=true
+      );
     translate([
       0,
-      -wallBraceExtrusion,
-      wallBraceHeight - wallBraceNarrowWidth,
+      wallBraceHeight + wallBraceNarrowWidth / 2,
+      0,
     ])
-      cube([wallBraceNarrowWidth, wallBraceExtrusion, 10]);
+      cube(
+        size=[wallBraceWideWidth, wallBraceNarrowWidth, wallBraceThickness],
+        center=true
+      );
+    translate([
+      0,
+      wallBraceExtrusion - wallBraceNarrowWidth / 2,
+      wallBraceExtrusion / 2,
+    ])
+      cube(
+        size = [wallBraceNarrowWidth, 10, wallBraceExtrusion],
+        center = true
+      );
   }
 }
 
 module shelfClamp() {
   union() {
     difference() {
-      cube([wallBraceNarrowWidth, wallBraceNarrowWidth, wallBraceNarrowWidth]);
+      cube(
+        size = [
+          wallBraceNarrowWidth,
+          wallBraceNarrowWidth,
+          wallBraceNarrowWidth,
+        ],
+        center = true
+      );
       translate([
-        wallBraceNarrowWidth / 2,
+        /* wallBraceNarrowWidth / 2, */
         0,
-        wallBraceNarrowWidth / 2,
+        0,
+        wallBraceNarrowWidth / 2 + 0.1,
       ])
-        rotate(a=90, v=[-1, 0, 0])
+        rotate(a=90, v=[1, 0, 0])
         countersink(wallBraceNarrowWidth);
     }
   }
@@ -45,13 +63,16 @@ module shelfClamp() {
 module countersink(length) {
   $fn=100;
   union() {
+    translate([0, -(screwHoleHeadThickness / 2), 0])
+      rotate(a=90, v=[1, 0, 0])
     cylinder(
       d1=screwHoleHeadDiameter,
       d2=screwHoleHeadDiameter,
       h=screwHoleHeadThickness,
       center = true
     );
-    translate([0, 0, -screwHoleHeadThickness])
+    translate([0, -screwHoleHeadThickness + 0.1, 0])
+      rotate(a=90, v=[1, 0, 0])
       cylinder(
         d=screwHoleShaftDiameter,
         h=length,
@@ -60,66 +81,12 @@ module countersink(length) {
   }
 }
 
-
-/**
- * The brace is a kind of support that extends from the wall mount to the
- * extursion that helps hold the load of the extursion. Downwards load should
- * transfer the force into the wall mount and therefore the wall itself.
- *
- *
- */
-module shelfWallBrace(x, y, width, thickness) {
-  let (
-    length = pow(pow(x, 2) + pow(y, 2), 1/2),
-    angle = atan(y/x)
-  )
-    translate([
-      0,
-      thickness * -0.60,
-      0,
-    ])
-    rotate(a=angle, v=[-1, 0, 0])
-    translate([
-      0,
-      -(length + thickness),
-      0
-    ])
-    {
-      union() {
-        cube([
-          width,
-          length,
-          thickness,
-        ]);
-      }
-      color("red") { sphere(5); }
-    }
-  rotate(a=angle, v=[-1, 0, 0])
-    color("green") {
-    cube([
-      10,
-      10,
-      10,
-    ]);
-  }
-  translate([
-  ])
-    rotate(a=angle, v=[-1, 0, 0])
-    color("green") {
-    cube([
-      10,
-      10,
-      10,
-    ]);
-  }
-}
-
 module shelfWallMount() {
   difference() {
     union() {
       translate([
         wallBraceNarrowWidth / 4,
-        wallBraceNarrowWidth,
+        0,
         0,
       ])
         shelfWallBrace(
@@ -133,33 +100,33 @@ module shelfWallMount() {
       }
       translate([
         0,
-        -wallBraceExtrusion - wallBraceNarrowWidth,
-        wallBraceHeight - wallBraceNarrowWidth,
+        wallBraceHeight + wallBraceNarrowWidth / 2,
+        wallBraceExtrusion + wallBraceNarrowWidth / 2,
       ])
         color("blue") {
         shelfClamp();
       }
     }
     translate([
-      countersinkWallLength / 2,
-      (screwHoleHeadThickness / 2) - 0.1,
-      5
+      0,
+      wallBraceNarrowWidth / 2,
+      screwHoleHeadThickness - 0.1,
     ])
-      rotate(a=90, v=[-1, 0, 0])
+      rotate(a=90, v=[1, 0, 0])
       countersink(countersinkWallLength);
     translate([
-      wallBraceWideWidth / 2,
-      (screwHoleHeadThickness / 2) - 0.1,
-      wallBraceHeight - wallBraceNarrowWidth / 2
+      wallBraceWideWidth / 2 - wallBraceNarrowWidth / 2,
+      wallBraceHeight + wallBraceNarrowWidth / 2,
+      screwHoleHeadThickness - 0.1,
     ])
-      rotate(a=90, v=[-1, 0, 0])
+      rotate(a=90, v=[1, 0, 0])
       countersink(countersinkWallLength);
     translate([
-      -wallBraceWideWidth / 2 + wallBraceNarrowWidth,
-      (screwHoleHeadThickness / 2) - 0.1,
-      wallBraceHeight - wallBraceNarrowWidth / 2
+      -wallBraceWideWidth / 2 + wallBraceNarrowWidth / 2,
+      wallBraceHeight + wallBraceNarrowWidth / 2,
+      screwHoleHeadThickness - 0.1,
     ])
-      rotate(a=90, v=[-1, 0, 0])
+      rotate(a=90, v=[1, 0, 0])
       countersink(countersinkWallLength);
   }
 }
