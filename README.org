@@ -1,0 +1,18 @@
+#+title:     OpenLock Shelf
+#+author:    Logan Barnett-Hoy
+#+email:     logustus@gmail.com
+#+date:      <2021-06-05 Sat>
+#+language:  en
+#+file_tags:
+#+tags:
+
+*Warning: Here be dragons!*
+
+This is my attempt at creating configurable model for mounting openlock terrain
+to a wall. The goal is to be adjustable (with a screw) to make it both very
+tight and also allow for a wall, no wall, and a foreground piece (such as a
+short wall, arch, or a "half tile"). Bonus is we'd be able to support a full tile
+(about 1 inch or 25mm).
+
+I know enough about OpenSCAD to be dangerous. Feel free to mock my approaches
+but only if you have suggestions on how to make it better ;)
