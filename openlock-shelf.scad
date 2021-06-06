@@ -1,4 +1,4 @@
-include <brace.scad>
+include <perpendicular-support.scad>
 screwHoleHeadDiameter = 4;
 screwHoleHeadThickness = 3;
 screwHoleShaftDiameter = 2;
@@ -87,18 +87,17 @@ module shelfWallMount() {
     union() {
       translate([
         0,
-        /* wallBraceNarrowWidth, */
-        0,
+        wallBraceNarrowWidth * 1.25,
         0,
       ])
-        shelfWallBrace(
-          wallBraceExtrusion,
-          wallBraceHeight,
+        perpendicularSupport(
+          wallBraceExtrusion - wallBraceNarrowWidth,
+          wallBraceHeight - wallBraceNarrowWidth * 1.25,
           wallBraceNarrowWidth / 2,
           wallBraceNarrowWidth * 0.75
         );
       color("teal") {
-        #shelfWallBraceFrame();
+        shelfWallBraceFrame();
       }
       translate([
         0,

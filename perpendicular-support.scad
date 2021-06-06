@@ -1,11 +1,11 @@
 include <util.scad>
 
 /**
- * The brace is a kind of support that extends from the wall mount to the
- * extursion that helps hold the load of the extursion. Downwards load should
- * transfer the force into the wall mount and therefore the wall itself.
+ * Build a support between two different, perpendicular points. This can
+ * transfer load in different directions.
  */
-module shelfWallBrace(x, y, width, thickness) {
+
+module perpendicularSupport(x, y, width, thickness) {
   let (
     angle = atan(x/y),
     intersectLengthY = pythagorean(thickness, thickness * tan(angle)),
@@ -52,12 +52,11 @@ module shelfWallBrace(x, y, width, thickness) {
             center=true
           );
         }
-        color("red") { sphere(5); }
       }
-    braceIntersectionRemoval("y", angle, thickness, width, intersectLengthZ);
+    supportIntersectionRemoval("y", angle, thickness, width, intersectLengthZ);
       translate([0, y, x])
         rotate(a=90, v=[1,0,0])
-        braceIntersectionRemoval(
+        supportIntersectionRemoval(
           "x",
           90 - angle,
           thickness,
@@ -67,7 +66,7 @@ module shelfWallBrace(x, y, width, thickness) {
   }
 }
 
-module braceIntersectionRemoval(
+module supportIntersectionRemoval(
   axis,
   angle,
   thickness,
