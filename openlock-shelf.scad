@@ -8,7 +8,7 @@ wallBraceWideWidth = 40;
 wallBraceNarrowWidth = 10;
 wallBraceHeight = 50;
 wallBraceThickness = 5;
-wallBraceExtrusion = 60;
+wallBraceExtrusion = 50;
 
 module shelfWallBraceFrame() {
   union() {
@@ -28,7 +28,7 @@ module shelfWallBraceFrame() {
       );
     translate([
       0,
-      wallBraceExtrusion - wallBraceNarrowWidth / 2,
+      wallBraceHeight + wallBraceNarrowWidth / 2,
       wallBraceExtrusion / 2,
     ])
       cube(
@@ -86,18 +86,19 @@ module shelfWallMount() {
   difference() {
     union() {
       translate([
-        wallBraceNarrowWidth / 4,
+        0,
+        /* wallBraceNarrowWidth, */
         0,
         0,
       ])
         shelfWallBrace(
           wallBraceExtrusion,
-          wallBraceHeight - wallBraceNarrowWidth,
+          wallBraceHeight,
           wallBraceNarrowWidth / 2,
           wallBraceNarrowWidth * 0.75
         );
       color("teal") {
-        shelfWallBraceFrame();
+        #shelfWallBraceFrame();
       }
       translate([
         0,
@@ -105,7 +106,7 @@ module shelfWallMount() {
         wallBraceExtrusion + wallBraceNarrowWidth / 2,
       ])
         color("blue") {
-        shelfClamp();
+        #shelfClamp();
       }
     }
     translate([

@@ -7,27 +7,38 @@ include <util.scad>
  */
 module shelfWallBrace(x, y, width, thickness) {
   let (
-    angle = atan(y/x),
+    angle = atan(x/y),
     intersectLengthY = pythagorean(thickness, thickness * tan(angle)),
-    intersectLengthX = pythagorean(thickness, thickness * tan(90 - angle)),
+    intersectLengthZ = pythagorean(thickness, thickness * tan(90 - angle)),
+    // The length hypotenus of the x and y are not sufficient, since they
+    // measure from the center of the beam on one side to the other. The
+    // outer side of the beam will have the longest dimension, and we need
+    // to treat the full length as the true length.
+    //
+    // We can model a triangle with the beam pivoting off of the surface it is
+    // attached to. A gap is created when the angle exceeds 45 degrees. So we
+    // compute a tangent based on our current angle (and the other side) to
+    // determine an offset. I thought this would be needed twice (for both the
+    // angle and the 90 - angle), but that doesn't seem to be the case.
+    //
+    // It is not lost on me that the angle we are taking the tangent of is the
+    // arc tangent of x/y so wouldn't that mean we could do x / y and skip the
+    // tangent function? I don't know. Perhaps it has the benefit of creating a
+    // normalzed scalar.
     length = pythagorean(x, y)
+      + tan(angle) * thickness / 2
   ) {
     translate([
       0,
-      /* 0, */
-      intersectLengthY / 2,
-      intersectLengthX / 2,
-      /* -0.5, */
-      /* -0.25, */
-      /* 0, */
-      /* 0, */
+      // Do not translate... yet! The consumer should be responsible for the
+      // offset.
+      0,
+      0,
     ])
-      rotate(a=angle, v=[-1, 0, 0])
+      rotate(a=angle, v=[1, 0, 0])
       translate([
-        width / 2,
-        /* 0, */
-        pythagorean(x, y) / -2,
-        /* -(length + thickness) / 2, */
+        0,
+        length / 2,
         0,
       ])
       {
@@ -43,14 +54,26 @@ module shelfWallBrace(x, y, width, thickness) {
         }
         color("red") { sphere(5); }
       }
-    braceIntersectionRemoval(angle, thickness, width, intersectLengthY);
-    rotate(a=-90, v=[1,0,0])
-      translate([0, -y, -(1 * sin(angle) * length)])
-      braceIntersectionRemoval(90 - angle, thickness, width, intersectLengthX);
+    braceIntersectionRemoval("y", angle, thickness, width, intersectLengthZ);
+      translate([0, y, x])
+        rotate(a=90, v=[1,0,0])
+        braceIntersectionRemoval(
+          "x",
+          90 - angle,
+          thickness,
+          width,
+          intersectLengthY
+        );
   }
 }
 
-module braceIntersectionRemoval(angle, thickness, width, intersectLength) {
+module braceIntersectionRemoval(
+  axis,
+  angle,
+  thickness,
+  width,
+  intersectLength
+) {
   let (
     // We computed this once, but compute it again because the angle differs.
     /* intersectLength = pythagorean(thickness, thickness * tan(angle)), */
@@ -60,50 +83,52 @@ module braceIntersectionRemoval(angle, thickness, width, intersectLength) {
     // case but it appears to completely cover the intersection area - just not
     // the rectangular area beyond it. So later we double the amounts so we can
     // move on. This is all to build up a subtractive area.
-    intersectDepth = sin(angle) * intersectLength,
-    depth = intersectLength + thickness * tan(angle)
+    depth = thickness * cos(angle),
+    // Hold onto your butts. I found the way to this via the law of cosines, but
+    // I don't actually know if I'm putting it to use. It's basically
+    // pythagorean's combined with trig.
+    // a^2 + b^2 = c^2
+    // b^2 = c^2 - b^2
+    // b^2 = intersectLength ^ 2 - depth^2
+    // Probabl divided by two because we're moving from the center?
+    adjacentSmallLength = sin(90 - angle) * intersectLength,
+    intersectionAlignOffset = pow(
+      pow(adjacentSmallLength, 2) - pow(depth, 2),
+      1/2
+    ) / 2
   ) {
     echo(str(
-      "angle: ",
-      angle,
+      "angle: ", angle,
+      " sin: ", sin(angle),
+      " cos: ", cos(angle),
+      " tan: ", tan(angle),
       " thickness: ",
       thickness,
       " width: ",
       width,
       " intersectLength: ",
       intersectLength,
-      " intersectDepth: ",
-      intersectDepth,
       " depth: ",
-      depth
+      depth,
+      " intersectionAlignOffset: ",
+      intersectionAlignOffset
     ));
-    sphere(3);
     translate([
-      width / 2,
-      intersectDepth / 2,
-      /* intersectLength * 0.66, */
-      // I do not understand why +1 works so well here, but it does for the
-      // bottom. The top is very close.
-      /* thickness + 1, */
-      /* thickness + sin(angle) * intersect, */
-      /* pythagorean(thickness, sin(angle) * interect) */
-      /* (thickness / 2), */
-      intersectLength,
+      0,
+      // I don't understand why one needs the offset and the other does not.
+      axis == "y" ? intersectionAlignOffset : 0,
+      axis == "x" ? depth / -2 : 0,
     ])
       color("green") {
-      sphere(3);
-      cube(
+      #cube(
         size = [
           width,
-          // We still wind up with corners poking out, so just double it to move
-          // on.
-          /* depth * 2, */
-          intersectDepth,
           intersectLength,
+          depth,
         ],
         center=true
       );
-      /* sphere(3); */
+      sphere(3);
     }
   }
 }
