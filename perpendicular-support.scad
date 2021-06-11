@@ -1,11 +1,19 @@
+include <cube.scad>
 include <util.scad>
 
 /**
  * Build a support between two different, perpendicular points. This can
  * transfer load in different directions.
+ *
+ * I've tried to use offset here, but it only works on 2D shapes. However
+ * building a "square" (which is used for rectangles too) results in different
+ * measurements even if center is set to true. This offset usage would allow a
+ * "fillet" along the edges that connect between the supported surfaces. It's
+ * kind of guilding the lily, so we're not doing it now.
  */
 
-module perpendicularSupport(x, y, width, thickness) {
+// TODO: Use polygons instead? It might make fillets easier.
+module perpendicularSupport(x, y, width, thickness, removeIntersection) {
   let (
     angle = atan(x/y),
     intersectLengthY = pythagorean(thickness, thickness * tan(angle)),
@@ -28,41 +36,47 @@ module perpendicularSupport(x, y, width, thickness) {
     length = pythagorean(x, y)
       + tan(angle) * thickness / 2
   ) {
-    translate([
-      0,
-      // Do not translate... yet! The consumer should be responsible for the
-      // offset.
-      0,
-      0,
-    ])
-      rotate(a=angle, v=[1, 0, 0])
+    difference() {
       translate([
         0,
-        length / 2,
+        // Do not translate... yet! The consumer should be responsible for the
+        // offset.
+        0,
         0,
       ])
-      {
-        union() {
-          cube(
-            size=[
-              width,
-              length,
-              thickness,
-            ],
-            center=true
-          );
-        }
-      }
-    supportIntersectionRemoval("y", angle, thickness, width, intersectLengthZ);
-      translate([0, y, x])
-        rotate(a=90, v=[1,0,0])
+        rotate(a=angle, v=[1, 0, 0])
+        translate([
+          0,
+          length / 2,
+          0,
+        ])
+        cube(
+          size=[
+            width,
+            length,
+            thickness,
+          ],
+          center=true
+        );
+      if(removeIntersection) {
         supportIntersectionRemoval(
-          "x",
-          90 - angle,
+          "y",
+          angle,
           thickness,
           width,
-          intersectLengthY
+          intersectLengthZ
         );
+        translate([0, y, x])
+          rotate(a=90, v=[1,0,0])
+          supportIntersectionRemoval(
+            "x",
+            90 - angle,
+            thickness,
+            width,
+            intersectLengthY
+          );
+      }
+    }
   }
 }
 
@@ -119,15 +133,16 @@ module supportIntersectionRemoval(
       axis == "x" ? depth / -2 : 0,
     ])
       color("green") {
-      #cube(
+      cube(
         size = [
-          width,
-          intersectLength,
+          width + 0.1, // Add some tolerance.
+          intersectLength * 1.25,
           depth,
         ],
         center=true
       );
-      sphere(3);
+      // Left to assist with debugging:
+      // sphere(3);
     }
   }
 }
