@@ -10,7 +10,7 @@ module shelfClamp(x, y, z, lipHeight, lipDepth) {
       translate([
         0,
         0,
-        z * 0.01,
+        z / 4,
       ])
         rotate(a=90, v=[1, 0, 0])
         countersink(m3, z);
