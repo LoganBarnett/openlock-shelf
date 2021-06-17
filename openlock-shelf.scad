@@ -11,8 +11,9 @@ wallBraceThickness = 5;
 // across, or perhaps more accurately 25mm (instead of 25.4mm? I haven't
 // verified). To hold a single E piece, plus two A-thickness pieces is 3 tiles
 // worth of space, or 75mm.
-// tiles = 2.5;
-tiles = 3;
+tiles = 2.5;
+/* tiles = 3; */
+/* tiles = 3.5; */
 // We don't want to make it an exact fit though - we want the clamp to bite down
 // on the piece.
 wallBraceExtrusion = tiles * 25 - wallBraceNarrowWidth / 2;
