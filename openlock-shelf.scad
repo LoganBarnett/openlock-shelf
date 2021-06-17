@@ -16,12 +16,12 @@ tiles = 2.5;
 /* tiles = 3.5; */
 // We don't want to make it an exact fit though - we want the clamp to bite down
 // on the piece.
-wallBraceExtrusion = tiles * 25 - wallBraceNarrowWidth / 2;
+wallBraceExtrusion = tiles * 25 - wallBraceNarrowWidth * 1.5;
 
 module shelfWallMount(preview) {
   union() {
     support();
-    crossSupport();
+    /* crossSupport(); */
     wallFrame();
     if(preview) {
       shelfClampPreview();
@@ -50,7 +50,7 @@ module shelfClampPrintable() {
   translate([
     wallBraceNarrowWidth + 3,
     wallBraceNarrowWidth / 2,
-    wallBraceNarrowWidth / 2 - (wallBraceNarrowWidth / 4),
+    wallBraceNarrowWidth / 2,
   ])
     shelfClamp(
       wallBraceNarrowWidth,
@@ -79,22 +79,43 @@ module crossSupport() {
 }
 
 module support() {
-  translate([
-    0,
-    wallBraceNarrowWidth * 1.25,
-    0,
-  ])
-    perpendicularSupport(
-      wallBraceExtrusion - wallBraceNarrowWidth,
-      wallBraceHeight - wallBraceNarrowWidth * 1.25,
-      wallBraceNarrowWidth / 2,
-      wallBraceNarrowWidth * 0.75,
-      true
-    );
+  let (
+    yOffset = wallBraceNarrowWidth * 1.25
+  ) {
+    difference() {
+      translate([
+        0,
+        yOffset,
+        // Offset it just a tad more so it intersects with the beam.
+        -1.0,
+      ])
+        perpendicularSupport(
+          wallBraceExtrusion * 0.66,
+          wallBraceHeight - yOffset,
+          wallBraceNarrowWidth,
+          wallBraceNarrowWidth * 0.75,
+          true
+        );
+      $fn=100;
+      translate([
+        0,
+        wallBraceHeight - wallBraceNarrowWidth,
+        0,
+      ])
+        cylinder(
+          d=screws[m5][screwHeadDiameterIndex],
+          // We could figure out precise placement, but if we just make the shaft as
+          // long as the extrusion then we never need to worry about it.
+          h=wallBraceExtrusion
+        );
+    }
+  }
 }
 
 preview = false;
-shelfWallMount(preview);
+translate([0, 0, wallBraceHeight + wallBraceNarrowWidth])
+rotate(a=90, v=[preview ? 0 : -1, 0, 0])
+  shelfWallMount(preview);
 if(!preview) {
   shelfClampPrintable();
 }
