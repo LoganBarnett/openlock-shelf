@@ -13,7 +13,7 @@ module countersink(mSize, length) {
     translate([0, -screws[mSize][screwHeadThicknessIndex] + 0.1, 0])
       rotate(a=90, v=[1, 0, 0])
       cylinder(
-        d=screws[mSize][screwShaftDiameterIndex],
+        d=screws[mSize][screwShaftClearanceDiameterIndex],
         h=length,
         center = false
       );
