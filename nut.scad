@@ -22,7 +22,7 @@ nuts = [
  * for sizes.
  */
 screwShaftDiameterIndex=0;
-screwShaftClearanceDiamaeterIndex=1;
+screwShaftClearanceDiameterIndex=1;
 screwHeadDiameterIndex=2;
 screwHeadThicknessIndex=3;
 screws = [
@@ -67,15 +67,21 @@ module hexNutBoreless(mSize) {
  * object in question.
  */
 module hexNutGap(mSize, countersinkDepth, nutDepth) {
-  union() {
-    hexNutBoreless(mSize);
-    let (
-      nutThickness = nuts[mSize][nutThicknessIndex]
-    ) {
-      translate([0, -(nutThickness + nutDepth), 0])
-        screwShaft(mSize, countersinkDepth + nutThickness);
+  let (
+    tolerance = 1.2
+  ) {
+    scale(tolerance) {
+      union() {
+        hexNutBoreless(mSize);
+      }
+      let (
+        nutThickness = nuts[mSize][nutThicknessIndex]
+      ) {
+        translate([0, -(nutThickness + nutDepth), 0])
+          screwShaft(mSize, countersinkDepth + nutThickness);
+      }
+      hexNutContinuation(mSize, nutDepth);
     }
-    hexNutContinuation(mSize, nutDepth);
   }
 }
 
@@ -94,7 +100,7 @@ module hexNutContinuation(mSize, depth) {
  */
 module screwShaft(mSize, length, nutThickness) {
   let (
-    screwBodyDiameter = screws[mSize]
+    screwBodyDiameter = screws[mSize][screwShaftClearanceDiameterIndex]
   ) {
     $fn=100;
     rotate(a=90, v=[1, 0, 0])
