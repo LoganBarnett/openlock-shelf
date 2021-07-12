@@ -40,7 +40,7 @@ module shelfClampPreview() {
       wallBraceNarrowWidth,
       wallBraceNarrowWidth,
       wallBraceNarrowWidth,
-      wallBraceNarrowWidth / 3,
+      wallBraceNarrowWidth / 2,
       wallBraceNarrowWidth / 4
     );
   }
@@ -56,7 +56,7 @@ module shelfClampPrintable() {
       wallBraceNarrowWidth,
       wallBraceNarrowWidth,
       wallBraceNarrowWidth,
-      wallBraceNarrowWidth / 3,
+      wallBraceNarrowWidth / 2,
       wallBraceNarrowWidth / 4
     );
 }
@@ -80,7 +80,9 @@ module crossSupport() {
 
 module support() {
   let (
-    yOffset = wallBraceNarrowWidth * 1.25
+    yOffset = wallBraceNarrowWidth * 1.25,
+    // Make it very narrow so we can fit screws into the countersink.
+    width = 2
   ) {
     difference() {
       translate([
@@ -92,21 +94,9 @@ module support() {
         perpendicularSupport(
           wallBraceExtrusion * 0.66,
           wallBraceHeight - yOffset,
-          wallBraceNarrowWidth,
+          width,
           wallBraceNarrowWidth * 0.75,
           true
-        );
-      $fn=100;
-      translate([
-        0,
-        wallBraceHeight - wallBraceNarrowWidth,
-        0,
-      ])
-        cylinder(
-          d=screws[m5][screwHeadDiameterIndex],
-          // We could figure out precise placement, but if we just make the shaft as
-          // long as the extrusion then we never need to worry about it.
-          h=wallBraceExtrusion
         );
     }
   }
