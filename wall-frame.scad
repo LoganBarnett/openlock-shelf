@@ -35,7 +35,7 @@ module overhangBeam() {
         center = true
       );
     let (
-      nutZ = (wallBraceNarrowWidth / 2) + 0.1
+      nutZ = (wallBraceNarrowWidth / 1.25) + 0.1
     ) {
       translate([
         0,
