@@ -26,7 +26,8 @@ screwShaftClearanceDiameterIndex=1;
 screwHeadDiameterIndex=2;
 screwHeadThicknessIndex=3;
 screws = [
-  [3, 3.3, 5, 5],
+  // m3 gets a little too tight around 3.3 and starts threading. Use 3.4.
+  [3, 3.4, 5, 5],
   [5, 5.5, 7, 5],
 ];
 
@@ -66,9 +67,9 @@ module hexNutBoreless(mSize) {
  * The hex nut gap is for placing both a hex nut and a screw inside of the
  * object in question.
  */
-module hexNutGap(mSize, countersinkDepth, nutDepth) {
+module hexNutCapture(mSize, countersinkDepth, nutDepth) {
   let (
-    tolerance = 1.2
+    tolerance = 1.3
   ) {
     scale(tolerance) {
       union() {
@@ -116,5 +117,5 @@ module screwShaft(mSize, length, nutThickness) {
 previewNutGap = false;
 if(previewNutGap) {
   translate([20, 20, -20])
-    hexNutGap(m5, 20, 10);
+    hexNutCapture(m5, 20, 10);
 }

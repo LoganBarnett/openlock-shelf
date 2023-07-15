@@ -5,6 +5,7 @@ include <wall-frame.scad>
 
 wallBraceWideWidth = 40;
 wallBraceNarrowWidth = 10;
+clampLipDepth = wallBraceNarrowWidth / 4;
 wallBraceHeight = 50;
 wallBraceThickness = 5;
 // This is how far out from the wall we go. OpenLock tiles are about 1 inch
@@ -16,12 +17,11 @@ tiles = 2.5;
 /* tiles = 3.5; */
 // We don't want to make it an exact fit though - we want the clamp to bite down
 // on the piece.
-wallBraceExtrusion = tiles * 25 - wallBraceNarrowWidth * 1.5;
+wallBraceExtrusion = tiles * 25 - (wallBraceNarrowWidth + clampLipDepth);
 
 module shelfWallMount(preview) {
   union() {
     support();
-    /* crossSupport(); */
     wallFrame();
     if(preview) {
       shelfClampPreview();
@@ -36,13 +36,7 @@ module shelfClampPreview() {
     wallBraceExtrusion + wallBraceNarrowWidth / 2,
   ])
     color("blue") {
-    shelfClamp(
-      wallBraceNarrowWidth,
-      wallBraceNarrowWidth,
-      wallBraceNarrowWidth,
-      wallBraceNarrowWidth / 2,
-      wallBraceNarrowWidth / 4
-    );
+    shelfClampBySettings();
   }
 }
 
@@ -52,30 +46,17 @@ module shelfClampPrintable() {
     wallBraceNarrowWidth / 2,
     wallBraceNarrowWidth / 2,
   ])
-    shelfClamp(
-      wallBraceNarrowWidth,
-      wallBraceNarrowWidth,
-      wallBraceNarrowWidth,
-      wallBraceNarrowWidth / 2,
-      wallBraceNarrowWidth / 4
-    );
+    shelfClampBySettings();
 }
 
-module crossSupport() {
-  translate([
-    0,
-    (wallBraceHeight - wallBraceNarrowWidth * 1.25) / 2
-    + wallBraceNarrowWidth * 1.25,
-    (wallBraceExtrusion - wallBraceNarrowWidth) / 2,
-  ])
-    rotate(a=180, v=[0, 1, 0])
-    perpendicularSupport(
-      (wallBraceExtrusion - wallBraceNarrowWidth * 1.75) / 2,
-      (wallBraceHeight - wallBraceNarrowWidth * 1.5) / 2,
-      wallBraceNarrowWidth * 0.25,
-      wallBraceNarrowWidth / 2,
-      false
-    );
+module shelfClampBySettings() {
+  shelfClamp(
+    wallBraceNarrowWidth,
+    wallBraceNarrowWidth,
+    wallBraceNarrowWidth,
+    wallBraceNarrowWidth / 2,
+    clampLipDepth
+  );
 }
 
 module support() {
@@ -84,21 +65,19 @@ module support() {
     // Make it very narrow so we can fit screws into the countersink.
     width = 2
   ) {
-    difference() {
-      translate([
-        0,
-        yOffset,
-        // Offset it just a tad more so it intersects with the beam.
-        -1.0,
-      ])
-        perpendicularSupport(
-          wallBraceExtrusion * 0.66,
-          wallBraceHeight - yOffset,
-          width,
-          wallBraceNarrowWidth * 0.75,
-          true
-        );
-    }
+    translate([
+      0,
+      yOffset,
+      // Offset it just a tad more so it intersects with the beam.
+      -1.0,
+    ])
+      perpendicularSupport(
+        wallBraceExtrusion * 0.66,
+        wallBraceHeight - yOffset,
+        width,
+        wallBraceNarrowWidth * 0.75,
+        true
+      );
   }
 }
 

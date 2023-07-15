@@ -16,14 +16,14 @@ module wallFrame() {
             ],
             center=true
           );
-        overhangBeam();
+        bridge();
       }
       wallFrameScrews();
     }
   }
 }
 
-module overhangBeam() {
+module bridge() {
   difference() {
     translate([
       0,
@@ -43,7 +43,7 @@ module overhangBeam() {
         wallBraceExtrusion - nutZ / 2,
       ])
         rotate(a=90, v=[-1,0,0])
-        hexNutGap(m3, 20, nutZ);
+        hexNutCapture(m3, 20, nutZ);
     }
   }
 }
